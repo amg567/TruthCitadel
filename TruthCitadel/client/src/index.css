@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(28, 25%, 95%);
+  --foreground: hsl(28, 25%, 8%);
+  --muted: hsl(28, 15%, 88%);
+  --muted-foreground: hsl(28, 10%, 45%);
+  --popover: hsl(28, 25%, 95%);
+  --popover-foreground: hsl(28, 25%, 8%);
+  --card: hsl(28, 25%, 95%);
+  --card-foreground: hsl(28, 25%, 8%);
+  --border: hsl(28, 15%, 82%);
+  --input: hsl(28, 15%, 82%);
+  --primary: hsl(43, 74%, 66%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(28, 15%, 88%);
+  --secondary-foreground: hsl(28, 25%, 12%);
+  --accent: hsl(28, 15%, 88%);
+  --accent-foreground: hsl(28, 25%, 12%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(60, 9%, 98%);
+  --ring: hsl(28, 25%, 8%);
+  --radius: 0.5rem;
+
+  /* Dark Academia Theme Colors */
+  --academia-dark: hsl(28, 25%, 8%);
+  --academia-brown: hsl(25, 43%, 27%);
+  --academia-gold: hsl(43, 74%, 66%);
+  --academia-beige: hsl(60, 56%, 91%);
+  --academia-red: hsl(0, 100%, 27%);
+  --academia-cream: hsl(60, 100%, 97%);
+  --academia-bronze: hsl(30, 60%, 50%);
+}
+
+.dark {
+  --background: hsl(28, 25%, 8%);
+  --foreground: hsl(60, 100%, 97%);
+  --muted: hsl(28, 15%, 15%);
+  --muted-foreground: hsl(28, 10%, 65%);
+  --popover: hsl(28, 25%, 8%);
+  --popover-foreground: hsl(60, 100%, 97%);
+  --card: hsl(28, 25%, 8%);
+  --card-foreground: hsl(60, 100%, 97%);
+  --border: hsl(28, 15%, 18%);
+  --input: hsl(28, 15%, 18%);
+  --primary: hsl(43, 74%, 66%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(28, 15%, 15%);
+  --secondary-foreground: hsl(60, 100%, 97%);
+  --accent: hsl(28, 15%, 15%);
+  --accent-foreground: hsl(60, 100%, 97%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(60, 100%, 97%);
+  --ring: hsl(240, 5%, 84%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: var(--academia-dark);
+    color: var(--academia-cream);
+  }
+
+  .theme-dark-academia {
+    --academia-dark: hsl(28, 25%, 8%);
+    --academia-brown: hsl(25, 43%, 27%);
+    --academia-gold: hsl(43, 74%, 66%);
+    --academia-beige: hsl(60, 56%, 91%);
+    --academia-red: hsl(0, 100%, 27%);
+    --academia-cream: hsl(60, 100%, 97%);
+    --academia-bronze: hsl(30, 60%, 50%);
+  }
+
+  .theme-classical {
+    --academia-dark: hsl(0, 0%, 10%);
+    --academia-brown: hsl(35, 20%, 15%);
+    --academia-gold: hsl(45, 100%, 51%);
+    --academia-beige: hsl(60, 20%, 85%);
+    --academia-red: hsl(0, 70%, 40%);
+    --academia-cream: hsl(60, 30%, 96%);
+    --academia-bronze: hsl(30, 50%, 45%);
+  }
+
+  .theme-modern {
+    --academia-dark: hsl(0, 0%, 6%);
+    --academia-brown: hsl(0, 0%, 17%);
+    --academia-gold: hsl(180, 100%, 42%);
+    --academia-beige: hsl(0, 0%, 85%);
+    --academia-red: hsl(0, 70%, 50%);
+    --academia-cream: hsl(0, 0%, 98%);
+    --academia-bronze: hsl(210, 40%, 60%);
+  }
+
+  .theme-minimalist {
+    --academia-dark: hsl(0, 0%, 100%);
+    --academia-brown: hsl(0, 0%, 96%);
+    --academia-gold: hsl(0, 0%, 20%);
+    --academia-beige: hsl(0, 0%, 85%);
+    --academia-red: hsl(0, 70%, 50%);
+    --academia-cream: hsl(0, 0%, 5%);
+    --academia-bronze: hsl(0, 0%, 40%);
+  }
+}
+
+@layer utilities {
+  .bg-academia-dark {
+    background-color: var(--academia-dark);
+  }
+
+  .bg-academia-brown {
+    background-color: var(--academia-brown);
+  }
+
+  .bg-academia-gold {
+    background-color: var(--academia-gold);
+  }
+
+  .bg-academia-beige {
+    background-color: var(--academia-beige);
+  }
+
+  .bg-academia-red {
+    background-color: var(--academia-red);
+  }
+
+  .bg-academia-cream {
+    background-color: var(--academia-cream);
+  }
+
+  .bg-academia-bronze {
+    background-color: var(--academia-bronze);
+  }
+
+  .text-academia-dark {
+    color: var(--academia-dark);
+  }
+
+  .text-academia-brown {
+    color: var(--academia-brown);
+  }
+
+  .text-academia-gold {
+    color: var(--academia-gold);
+  }
+
+  .text-academia-beige {
+    color: var(--academia-beige);
+  }
+
+  .text-academia-red {
+    color: var(--academia-red);
+  }
+
+  .text-academia-cream {
+    color: var(--academia-cream);
+  }
+
+  .text-academia-bronze {
+    color: var(--academia-bronze);
+  }
+
+  .border-academia-gold {
+    border-color: var(--academia-gold);
+  }
+
+  .border-academia-brown {
+    border-color: var(--academia-brown);
+  }
+
+  .border-academia-beige {
+    border-color: var(--academia-beige);
+  }
+
+  .font-serif {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .font-sans {
+    font-family: 'Inter', sans-serif;
+  }
+}
