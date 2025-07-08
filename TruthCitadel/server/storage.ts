@@ -19,13 +19,28 @@ import {
   type InsertIntegration,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User>;
+  
+  // Admin operations
+  getAllUsers(): Promise<User[]>;
+  getAllContentEntries(): Promise<ContentEntry[]>;
+  getAllReminders(): Promise<Reminder[]>;
+  getAllActivities(): Promise<ActivityLog[]>;
+  updateUserRole(userId: string, role: string): Promise<User>;
+  deleteUser(userId: string): Promise<void>;
+  getSystemStats(): Promise<{
+    totalUsers: number;
+    totalContent: number;
+    totalReminders: number;
+    totalActivities: number;
+    subscriptionBreakdown: { status: string; count: number }[];
+  }>;
   
   // Content operations
   getUserContentEntries(userId: string, category?: string): Promise<ContentEntry[]>;
@@ -215,6 +230,96 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return result;
+  }
+
+  // Admin operations
+  async getAllUsers(): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .orderBy(desc(users.createdAt));
+  }
+
+  async getAllContentEntries(): Promise<ContentEntry[]> {
+    return await db
+      .select()
+      .from(contentEntries)
+      .orderBy(desc(contentEntries.createdAt));
+  }
+
+  async getAllReminders(): Promise<Reminder[]> {
+    return await db
+      .select()
+      .from(reminders)
+      .orderBy(desc(reminders.createdAt));
+  }
+
+  async getAllActivities(): Promise<ActivityLog[]> {
+    return await db
+      .select()
+      .from(activityLog)
+      .orderBy(desc(activityLog.createdAt));
+  }
+
+  async updateUserRole(userId: string, role: string): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ role, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    // Delete user's content, reminders, stats, and activities first
+    await db.delete(contentEntries).where(eq(contentEntries.userId, userId));
+    await db.delete(reminders).where(eq(reminders.userId, userId));
+    await db.delete(userStats).where(eq(userStats.userId, userId));
+    await db.delete(activityLog).where(eq(activityLog.userId, userId));
+    await db.delete(integrations).where(eq(integrations.userId, userId));
+    
+    // Finally delete the user
+    await db.delete(users).where(eq(users.id, userId));
+  }
+
+  async getSystemStats(): Promise<{
+    totalUsers: number;
+    totalContent: number;
+    totalReminders: number;
+    totalActivities: number;
+    subscriptionBreakdown: { status: string; count: number }[];
+  }> {
+    const [userCount] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(users);
+    
+    const [contentCount] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(contentEntries);
+    
+    const [reminderCount] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(reminders);
+    
+    const [activityCount] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(activityLog);
+    
+    const subscriptionBreakdown = await db
+      .select({
+        status: users.subscriptionStatus,
+        count: sql<number>`count(*)`
+      })
+      .from(users)
+      .groupBy(users.subscriptionStatus);
+
+    return {
+      totalUsers: userCount?.count || 0,
+      totalContent: contentCount?.count || 0,
+      totalReminders: reminderCount?.count || 0,
+      totalActivities: activityCount?.count || 0,
+      subscriptionBreakdown: subscriptionBreakdown || [],
+    };
   }
 }
 
