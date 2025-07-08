@@ -15,6 +15,7 @@ import Music from "@/pages/music";
 import Reminders from "@/pages/reminders";
 import Settings from "@/pages/settings";
 import Subscribe from "@/pages/subscribe";
+import AdminDashboard from "@/pages/admin";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -33,6 +34,7 @@ function Router() {
           <Route path="/reminders" component={Reminders} />
           <Route path="/settings" component={Settings} />
           <Route path="/subscribe" component={Subscribe} />
+          <Route path="/admin" component={AdminDashboard} />
         </>
       )}
       <Route component={NotFound} />
