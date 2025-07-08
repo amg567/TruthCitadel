@@ -14,7 +14,8 @@ import {
   Settings, 
   Sparkles,
   Crown,
-  MessageCircle
+  MessageCircle,
+  Shield
 } from "lucide-react";
 import { SiDiscord, SiNotion } from "react-icons/si";
 
@@ -119,6 +120,20 @@ export function Sidebar() {
             </Link>
           );
         })}
+        
+        {/* Admin Link - Only show for admin users */}
+        {user?.role === 'admin' && (
+          <Link href="/admin">
+            <div className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+              location === '/admin' 
+                ? "bg-academia-gold/20 text-academia-gold border border-academia-gold/30" 
+                : "hover:bg-academia-gold/10 text-academia-cream"
+            }`}>
+              <Shield className="w-5 h-5" />
+              <span>Admin Dashboard</span>
+            </div>
+          </Link>
+        )}
       </nav>
 
       {/* Integrations */}
