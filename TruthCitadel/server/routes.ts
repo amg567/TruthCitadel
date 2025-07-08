@@ -3,6 +3,21 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+
+// Admin middleware
+const isAdmin = async (req: any, res: any, next: any) => {
+  try {
+    const userId = req.user.claims.sub;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    next();
+  } catch (error) {
+    console.error("Error checking admin status:", error);
+    res.status(500).json({ message: "Failed to verify admin status" });
+  }
+};
 import { insertContentEntrySchema, insertReminderSchema, insertActivityLogSchema, insertIntegrationSchema } from "@shared/schema";
 import { ZodError } from "zod";
 
@@ -256,6 +271,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating subscription:", error);
       res.status(500).json({ message: "Failed to create subscription" });
+    }
+  });
+
+  // Admin routes
+  app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const stats = await storage.getSystemStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching system stats:", error);
+      res.status(500).json({ message: "Failed to fetch system stats" });
+    }
+  });
+
+  app.get('/api/admin/users', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.get('/api/admin/content', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const content = await storage.getAllContentEntries();
+      res.json(content);
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      res.status(500).json({ message: "Failed to fetch content" });
+    }
+  });
+
+  app.get('/api/admin/reminders', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const reminders = await storage.getAllReminders();
+      res.json(reminders);
+    } catch (error) {
+      console.error("Error fetching reminders:", error);
+      res.status(500).json({ message: "Failed to fetch reminders" });
+    }
+  });
+
+  app.get('/api/admin/activities', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const activities = await storage.getAllActivities();
+      res.json(activities);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+      res.status(500).json({ message: "Failed to fetch activities" });
+    }
+  });
+
+  app.put('/api/admin/users/:userId/role', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { userId } = req.params;
+      const { role } = req.body;
+      
+      if (!['user', 'admin'].includes(role)) {
+        return res.status(400).json({ message: "Invalid role" });
+      }
+      
+      const updatedUser = await storage.updateUserRole(userId, role);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      res.status(500).json({ message: "Failed to update user role" });
+    }
+  });
+
+  app.delete('/api/admin/users/:userId', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { userId } = req.params;
+      const currentUserId = req.user.claims.sub;
+      
+      if (userId === currentUserId) {
+        return res.status(400).json({ message: "Cannot delete your own account" });
+      }
+      
+      await storage.deleteUser(userId);
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
     }
   });
 
